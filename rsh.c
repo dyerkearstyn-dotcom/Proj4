@@ -152,14 +152,8 @@ int main(int argc, char **argv) {
 			printf("sendmsg: you have to enter a message\n");
 			continue;
 		}
-		msg = temp;
-		temp = strtok(NULL," ");
-		while(temp!=NULL){
-			strcat(msg," ");
-			strcat(msg,temp);
-			temp = strtok(NULL," ");
-		}
-		sendmsg(uName,target,msg);
+		
+		sendmsg(uName,target,temp);
 
 		continue;
 	}
