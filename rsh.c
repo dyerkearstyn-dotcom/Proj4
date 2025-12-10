@@ -6,6 +6,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include <pthread.h>
+#include <signal.h>
 
 #define N 13
 
@@ -36,8 +37,8 @@ void sendmsg (char *user, char *target, char *msg) {
     strcpy(req.source,user); 
     strcpy(req.target, target); 
     strcpy(req.msg, msg); 
-    write(server,req.msg,sizeof(req.msg)); 
-
+    write(server,&req,sizeof(struct message)); 
+	close(server);
 }
 
 void* messageListener(void *arg) {
@@ -49,12 +50,28 @@ void* messageListener(void *arg) {
 	// Incoming message from [source]: [message]
 	// put an end of line at the end of the message
 	int client;
-    while(1){ 
-        client = open(arg,O_RDONLY); 
-		struct message req;
-        read(client,&req,sizeof(struct message)); 
-    } 
+	int dummyfd;
+	struct message req;
+	signal(SIGPIPE,SIG_IGN);
+	signal(SIGINT,terminate);
+	client = open(arg,O_RDONLY);
+	dummyfd = open(arg,O_WRONLY);
 
+	while (1) {
+		// TODO:
+		// read requests from serverFIFO
+		
+		if (read(client,&req,sizeof(struct message))<=0){
+			continue;
+		} 
+		printf("Incoming message from %s: %s.\n",req.source,req.msg);
+
+	}
+	close(client);
+	close(dummyfd);
+	
+	return 0;
+	
 	pthread_exit((void*)0);
 }
 
@@ -86,11 +103,12 @@ int main(int argc, char **argv) {
 
     // TODO:
     // create the message listener thread
-
-
-
-
-
+	pthread_t thread;
+	int result = pthread_create(&thread,NULL,messageListener,NULL);
+	if(result !=0) {
+		printf("Thread Failed\n");
+	}
+	
     while (1) {
 
 	fprintf(stderr,"rsh>");
@@ -124,15 +142,25 @@ int main(int argc, char **argv) {
 		// printf("sendmsg: you have to specify target user\n");
 		// if no message is specified, you should print the followingA
  		// printf("sendmsg: you have to enter a message\n");
-
-
-
-
-
-
-
-
-
+		char * temp = strtok(NULL," ");
+		char * msg;
+		if(temp == NULL){
+			printf("sendmsg: you have to specify target user\n");
+			continue;
+		}
+		char *target = temp;
+		temp = strtok(NULL," ");
+		if(temp == NULL){
+			printf("sendmsg: you have to enter a message\n");
+			continue;
+		}
+		msg = temp;
+		temp = strtok(NULL," ");
+		while(temp!=NULL){
+			strcat(msg,temp);
+			temp = strtok(NULL," ");
+		}
+		sendmsg(uName,target,msg);
 
 		continue;
 	}
