@@ -62,7 +62,7 @@ void* messageListener(void *arg) {
 		if (read(client,&req,sizeof(struct message))<=0){
 			continue;
 		} 
-		printf("Incoming message from %s: %s.\n",req.source,req.msg);
+		printf("Incoming message from %s: %s \n",req.source,req.msg);
 
 	}
 	close(client);
@@ -147,7 +147,7 @@ int main(int argc, char **argv) {
 			continue;
 		}
 		char *target = temp;
-		temp = strtok(NULL," ");
+		temp = strtok(NULL,"\n");
 		if(temp == NULL){
 			printf("sendmsg: you have to enter a message\n");
 			continue;
