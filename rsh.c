@@ -155,6 +155,7 @@ int main(int argc, char **argv) {
 		msg = temp;
 		temp = strtok(NULL," ");
 		while(temp!=NULL){
+			strcat(msg," ");
 			strcat(msg,temp);
 			temp = strtok(NULL," ");
 		}
