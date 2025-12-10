@@ -52,10 +52,8 @@ void* messageListener(void *arg) {
 	int client;
 	int dummyfd;
 	struct message req;
-	signal(SIGPIPE,SIG_IGN);
-	signal(SIGINT,terminate);
-	client = open(arg,O_RDONLY);
-	dummyfd = open(arg,O_WRONLY);
+	client = open(uName,O_RDONLY);
+	dummyfd = open(uName,O_WRONLY);
 
 	while (1) {
 		// TODO:
